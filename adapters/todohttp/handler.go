@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 	"net/http"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
@@ -20,12 +21,12 @@ var (
 type TodoHandler struct {
 	http.Handler
 
-	list      *todo.List
+	list      todo.TodoList
 	todoView  *views.ModelView[todo.Todo]
 	indexView *views.IndexView
 }
 
-func NewTodoHandler(service *todo.List, todoView *views.ModelView[todo.Todo], indexView *views.IndexView) (*TodoHandler, error) {
+func NewTodoHandler(service todo.TodoList, todoView *views.ModelView[todo.Todo], indexView *views.IndexView) (*TodoHandler, error) {
 	router := mux.NewRouter()
 	handler := &TodoHandler{
 		Handler:   router,
@@ -54,12 +55,21 @@ func NewTodoHandler(service *todo.List, todoView *views.ModelView[todo.Todo], in
 }
 
 func (t *TodoHandler) index(w http.ResponseWriter, _ *http.Request) {
-	t.indexView.Index(w, t.list.Todos())
+	todos, err := t.list.Todos()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	t.indexView.Index(w, todos)
 }
 
 func (t *TodoHandler) add(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	t.list.Add(r.FormValue("description"))
+	description := r.FormValue("description")
+	description = strings.TrimSpace(description)
+	if description != "" {
+		t.list.Add(description)
+	}
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
@@ -69,7 +79,12 @@ func (t *TodoHandler) toggle(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	t.todoView.View(w, t.list.ToggleDone(id))
+	todo, err := t.list.ToggleDone(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	t.todoView.View(w, todo)
 }
 
 func (t *TodoHandler) delete(w http.ResponseWriter, r *http.Request) {
@@ -84,12 +99,21 @@ func (t *TodoHandler) delete(w http.ResponseWriter, r *http.Request) {
 func (t *TodoHandler) reOrder(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	t.list.ReOrder(r.Form["id"])
-	t.todoView.List(w, t.list.Todos())
+	todos, err := t.list.Todos()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	t.todoView.List(w, todos)
 }
 
 func (t *TodoHandler) search(w http.ResponseWriter, r *http.Request) {
 	searchTerm := r.URL.Query().Get("search")
-	results := t.list.Search(searchTerm)
+	results, err := t.list.Search(searchTerm)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	t.todoView.List(w, results)
 }
 
@@ -102,7 +126,19 @@ func (t *TodoHandler) rename(w http.ResponseWriter, r *http.Request) {
 	}
 
 	newName := r.Form["name"][0]
-	t.todoView.View(w, t.list.Rename(id, newName))
+	newName = strings.TrimSpace(newName)
+	var todo todo.Todo
+	if newName != "" {
+		todo, err = t.list.Rename(id, newName)
+
+	} else {
+		todo, err = t.list.Get(id)
+	}
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	t.todoView.View(w, todo)
 }
 
 func (t *TodoHandler) edit(w http.ResponseWriter, r *http.Request) {
@@ -111,7 +147,11 @@ func (t *TodoHandler) edit(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	item := t.list.Get(id)
+	item, err := t.list.Get(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	t.todoView.Edit(w, item)
 }
 

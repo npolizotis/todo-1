@@ -1,15 +1,16 @@
 {{define "edit_todo"}}
     <div data-description="{{.Description}}">
         <input type="hidden" name="id" value="{{.ID}}"/>
-        <button disabled>❌</button>
-        <button disabled>📝</button>
+        {{/* <button disabled>❌</button>
+        <button disabled>📝</button> */}}
         <form hx-patch="todos/{{.ID}}"
               hx-target="closest div"
               hx-swap="outerHTML"
             >
-            <input type="text" name="name">
+            <input type="text" name="name" placeholder="Leave empty to abort">
             <input type="submit">
         </form>
         <span {{if .Complete}} class="done" {{end}}>{{.Description}}</span>
+		<span>({{ .UpdatedAt.Format "2006 Jan Mon 15:04:05" }})</span>
     </div>
 {{end}}

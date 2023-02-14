@@ -44,35 +44,40 @@ func TestNewTodoHandler(t *testing.T) {
 		todoListPage.Add("Eat cheese")
 		todoListPage.Add("Drink port")
 
-		assert.Equal(t, 2, len(todoList.Todos()))
-		assert.Equal(t, "Eat cheese", todoList.Todos()[0].Description)
-		assert.Equal(t, "Drink port", todoList.Todos()[1].Description)
+		todos,_:=todoList.Todos()
+		assert.Equal(t, 2, len(todos))
+		assert.Equal(t, "Eat cheese", todos[0].Description)
+		assert.Equal(t, "Drink port", todos[1].Description)
 	})
 
 	it("can edit a todoview", func(t *testing.T) {
 		todoListPage.Add("Eat cheese")
+		todos,_:=todoList.Todos()
 		todoListPage.Edit("Eat cheese", "Eat cheese and crackers")
-		assert.Equal(t, "Eat cheese and crackers", todoList.Todos()[0].Description)
+		assert.Equal(t, "Eat cheese and crackers", todos[0].Description)
 	})
 
 	it("can delete a todoview", func(t *testing.T) {
 		todoListPage.Add("Eat cheese")
 		todoListPage.Add("Drink port")
-		assert.Equal(t, 2, len(todoList.Todos()))
+		todos,_:=todoList.Todos()
+		assert.Equal(t, 2, len(todos))
 
 		todoListPage.Delete("Drink port")
-		assert.Equal(t, 1, len(todoList.Todos()))
-		assert.Equal(t, "Eat cheese", todoList.Todos()[0].Description)
+		todos,_=todoList.Todos()
+		assert.Equal(t, 1, len(todos))
+		assert.Equal(t, "Eat cheese", todos[0].Description)
 	})
 
 	it("can mark a todoview as done", func(t *testing.T) {
 		todoListPage.Add("Mark this as done")
-		assert.False(t, todoList.Todos()[0].Complete)
+		todos,_:=todoList.Todos()
+		assert.False(t, todos[0].Complete)
 
 		todoListPage.Toggle("Mark this as done")
-		assert.True(t, todoList.Todos()[0].Complete)
+		assert.True(t, todos[0].Complete)
 		todoListPage.Toggle("Mark this as done")
-		assert.False(t, todoList.Todos()[0].Complete)
+		assert.False(t, todos[0].Complete)
 	})
 
 	//t.Run("todoview: attempts at testing drag and drog", func(t *testing.T) {

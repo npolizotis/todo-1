@@ -10,7 +10,8 @@ import (
 func TestService(t *testing.T) {
 	t.Run("can add todoview and toggle completion", func(t *testing.T) {
 		service := todo.List{}
-		assert.Equal(t, 0, len(service.Todos()))
+		todos,_:=service.Todos()
+		assert.Equal(t, 0, len(todos))
 
 		someTask := "kill react"
 		service.Add(someTask)
@@ -18,18 +19,18 @@ func TestService(t *testing.T) {
 		service.Add("blah blah 2")
 		service.Add("blah blah 3")
 
-		todos := service.Todos()
+		todos,_ = service.Todos()
 		assert.False(t, todos[0].Complete)
 		id := todos[0].ID
 
 		service.ToggleDone(id)
 
-		todos = service.Todos()
+		todos,_ = service.Todos()
 		assert.True(t, todos[0].Complete)
 
 		service.ToggleDone(id)
 
-		todos = service.Todos()
+		todos,_ = service.Todos()
 		assert.False(t, todos[0].Complete)
 	})
 
@@ -38,13 +39,13 @@ func TestService(t *testing.T) {
 		service.Add("kill react")
 		service.Add("blah blah 1")
 
-		todos := service.Todos()
+		todos,_ := service.Todos()
 		assert.Equal(t, "kill react", todos[0].Description)
 		id := todos[0].ID
 
 		service.Rename(id, "kill react and redux")
 
-		todos = service.Todos()
+		todos,_ = service.Todos()
 		assert.Equal(t, "kill react and redux", todos[0].Description)
 		assert.Equal(t, "blah blah 1", todos[1].Description)
 	})
@@ -56,13 +57,13 @@ func TestService(t *testing.T) {
 		service.Add("blah blah 2")
 		service.Add("blah blah 3")
 
-		todos := service.Todos()
+		todos,_ := service.Todos()
 		assert.Equal(t, 4, len(todos))
 		id := todos[0].ID
 
 		service.Delete(id)
 
-		todos = service.Todos()
+		todos,_ = service.Todos()
 		assert.Equal(t, 3, len(todos))
 		assert.Equal(t, "blah blah 1", todos[0].Description)
 		assert.Equal(t, "blah blah 2", todos[1].Description)
@@ -76,7 +77,7 @@ func TestService(t *testing.T) {
 		service.Add("blah blah 2")
 		service.Add("blah blah 3")
 
-		todos := service.Todos()
+		todos,_ := service.Todos()
 		assert.Equal(t, 4, len(todos))
 		assert.Equal(t, "kill react", todos[0].Description)
 
@@ -88,7 +89,7 @@ func TestService(t *testing.T) {
 			todos[0].ID.String(),
 		})
 
-		todos = service.Todos()
+		todos,_ = service.Todos()
 		assert.Equal(t, 4, len(todos))
 		assert.Equal(t, "blah blah 3", todos[0].Description)
 		assert.Equal(t, "blah blah 2", todos[1].Description)
@@ -103,7 +104,7 @@ func TestService(t *testing.T) {
 		service.Add("blah blah 2")
 		service.Add("blah blah 3")
 
-		todos := service.Search("blah")
+		todos,_ := service.Search("blah")
 		assert.Equal(t, 3, len(todos))
 		assert.Equal(t, "blah blah 1", todos[0].Description)
 		assert.Equal(t, "blah blah 2", todos[1].Description)
@@ -117,12 +118,12 @@ func TestService(t *testing.T) {
 		service.Add("blah blah 2")
 		service.Add("blah blah 3")
 
-		todos := service.Todos()
+		todos,_ := service.Todos()
 		assert.Equal(t, 4, len(todos))
 
 		service.Empty()
 
-		todos = service.Todos()
+		todos,_ = service.Todos()
 		assert.Equal(t, 0, len(todos))
 	})
 

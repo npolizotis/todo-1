@@ -1,0 +1,1 @@
+delete from todo where id in ('ba39b72c-59ec-4357-b481-fd9277a7d1ab','28bda06d-8720-4acc-a806-0e88703cc6d4','68ba91f9-7714-4a5e-bf1d-12ad8f3c9af2');

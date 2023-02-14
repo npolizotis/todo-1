@@ -4,5 +4,6 @@
         <button class="delete" hx-target="closest div" hx-swap="outerHTML" hx-delete="/todos/{{.ID}}">❌</button>
         <button class="edit" hx-target="closest div" hx-swap="outerHTML" hx-get="/todos/{{.ID}}/edit">📝</button>
         <span {{if .Complete}} class="done" {{end}} hx-target="closest div" hx-swap="outerHTML" hx-post="/todos/{{.ID}}/toggle">{{.Description}}</span>
+		<span>({{ .UpdatedAt.Format "2006 Jan Mon 15:04:05" }})</span>
     </div>
 {{end}}
