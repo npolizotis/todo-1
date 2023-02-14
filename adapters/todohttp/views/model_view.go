@@ -24,6 +24,10 @@ func (t *ModelView[T]) List(w http.ResponseWriter, results []T) {
 	t.renderOr500(w, t.modelName+"s", results)
 }
 
+func (t *ModelView[T]) Add(w http.ResponseWriter) {
+	t.renderOr500(w, "add_"+t.modelName, struct{}{})
+}
+
 func (t *ModelView[T]) View(w http.ResponseWriter, item T) {
 	t.renderOr500(w, "view_"+t.modelName, item)
 }

@@ -70,7 +70,14 @@ func (t *TodoHandler) add(w http.ResponseWriter, r *http.Request) {
 	if description != "" {
 		t.list.Add(description)
 	}
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	//http.Redirect(w, r, "/", http.StatusSeeOther)
+	todos, err := t.list.Todos()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	t.todoView.List(w, todos)
+	t.todoView.Add(w)
 }
 
 func (t *TodoHandler) toggle(w http.ResponseWriter, r *http.Request) {

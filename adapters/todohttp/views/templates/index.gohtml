@@ -24,10 +24,11 @@
 
     <form hx-post="/todos/sort" hx-trigger="end" class="sortable" id="todos">
         {{/*template "todos" .*/}}
-		<span hx-get="/todos" hx-trigger="load delay:0.3s" hx-target="#todos" hx-replace="innerHTML">Loading ... </span>
+		<span hx-get="/todos" hx-trigger="load delay:0.5s" hx-target="#todos" hx-replace="innerHTML">Loading ... </span>
     </form>
-    <form method="post" action="/todos">
-        <label>Description <input type="text" minlength="3" name="description" autofocus/></label>
+	
+    <form action="/todos" hx-post="/todos" hx-target="#todos">
+        <div id="new_form"><label>Description <input type="text" minlength="3" name="description" autofocus/></label></div>
     </form>
 </section>
 </body>
